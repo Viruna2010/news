@@ -22,11 +22,19 @@
 
         #particles-js { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
 
-        /* Clock Style */
+       /* Clock Style - දකුණු පැත්තේ යටින් පෙන්වීමට */
         #clock {
-            position: absolute; top: 20px; right: 20px;
-            font-family: 'Orbitron', sans-serif; color: var(--neon-blue);
-            font-size: 16px; letter-spacing: 2px; z-index: 20;
+            position: absolute; 
+            bottom: 20px; /* මේක bottom වලට දැම්මා */
+            right: 20px; 
+            font-family: 'Orbitron', sans-serif; 
+            color: var(--neon-blue);
+            font-size: 16px; 
+            letter-spacing: 2px; 
+            z-index: 20;
+            background: rgba(2, 6, 23, 0.5); /* ලස්සනට පේන්න පසුබිමකුත් දැම්මා */
+            padding: 5px 10px;
+            border-radius: 5px;
         }
 
         /* Welcome Overlay */
