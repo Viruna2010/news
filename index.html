@@ -10,6 +10,7 @@
         :root { 
             --neon-blue: #00d2ff; 
             --neon-red: #ff0000;
+            --panel-red: #ff0055;
             --dark-bg: #020617; 
         }
 
@@ -18,11 +19,17 @@
             font-family: 'Noto Sans Sinhala', sans-serif;
             height: 100vh; display: flex; flex-direction: column;
             align-items: center; justify-content: center; overflow: hidden;
+            box-sizing: border-box;
+        }
+
+        /* Hardware Acceleration Class */
+        .hw-boost-active {
+            transform: translateZ(0);
+            will-change: transform, opacity, filter;
         }
 
         #particles-js { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
 
-        /* Clock Style */
         #clock {
             position: absolute; 
             bottom: 60px; 
@@ -37,7 +44,6 @@
             border-radius: 5px;
         }
 
-        /* Welcome Overlay */
         #welcome-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: radial-gradient(circle, #0a192f 0%, #020617 100%);
@@ -67,7 +73,6 @@
             text-align: center;
         }
 
-        /* Header Style */
         .header { position: absolute; top: 40px; text-align: center; z-index: 10; width: 100%; }
         .viru-logo { 
             font-family: 'Orbitron', sans-serif;
@@ -75,13 +80,6 @@
             letter-spacing: 4px; text-transform: uppercase;
             text-shadow: 0 0 20px rgba(0, 210, 255, 0.5);
             white-space: nowrap;
-        }
-
-        @media screen and (max-width: 600px) {
-            .viru-logo { letter-spacing: 1px; font-size: 20px; }
-            .overlay-logo { letter-spacing: 2px; font-size: 22px; }
-            .news-container { width: 90%; padding: 30px 15px; }
-            .footer { letter-spacing: 1px; font-size: 8px; }
         }
 
         .live-tag {
@@ -100,13 +98,17 @@
             padding: 60px 40px; z-index: 5;
             background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(12px);
             border: 1px solid rgba(0, 210, 255, 0.2); border-radius: 2rem;
-            box-shadow: 0 0 40px rgba(0,0,0,0.5);
+            box-shadow: 0 0 40px rgba(0,0,0,0.5); transition: all 0.5s ease;
+            box-sizing: border-box;
         }
+        
+        .border-pulse-active { animation: borderGlow 2s infinite alternate; }
+        @keyframes borderGlow { 0% { border-color: rgba(0, 210, 255, 0.2); } 100% { border-color: rgba(0, 210, 255, 0.8); box-shadow: 0 0 30px rgba(0, 210, 255, 0.2); } }
 
         .headline { 
             font-size: clamp(18px, 4vw, 45px); color: #fff; font-weight: 800;
             line-height: 1.5; transition: opacity 0.8s ease-in-out;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5); word-break: break-word;
         }
 
         .footer {
@@ -121,41 +123,266 @@
             position: absolute; bottom: 85px; width: 80%;
             font-size: 10px; color: #475569; text-align: center; font-weight: bold;
         }
+
+        .vignette-active { box-shadow: inset 0 0 100px rgba(0,0,0,0.8); pointer-events: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 8; }
+        #maintenance-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 99; display: none; flex-direction: column; align-items: center; justify-content: center; font-family: 'Orbitron', sans-serif; padding: 20px; text-align: center; box-sizing: border-box; }
+
+        #sync-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(2, 6, 23, 0.95); z-index: 300;
+            display: none; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .sync-box { width: 80%; max-width: 400px; text-align: center; font-family: 'Orbitron', sans-serif; }
+        .sync-title { font-size: 16px; color: var(--neon-blue); letter-spacing: 2px; margin-bottom: 15px; }
+        .progress-container { width: 100%; height: 6px; background: #1e293b; border-radius: 10px; overflow: hidden; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
+        .progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, #0072ff, var(--neon-blue)); transition: width 0.1s linear; box-shadow: 0 0 10px var(--neon-blue); }
+        .sync-percentage { font-size: 24px; color: white; margin-top: 10px; font-weight: bold; }
+
+        #viru-settings-panel {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.9);
+            width: 92%; max-width: 440px; background: rgba(10, 2, 6, 0.98); border: 2px solid var(--panel-red);
+            border-radius: 20px; padding: 20px; z-index: 200; 
+            box-shadow: 0 0 40px rgba(255, 0, 85, 0.4), inset 0 0 20px rgba(255, 0, 85, 0.1);
+            backdrop-filter: blur(25px); display: none; opacity: 0; 
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            max-height: 80vh; overflow-y: auto; box-sizing: border-box;
+        }
+        #viru-settings-panel.open { display: block; opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        #viru-settings-panel h2 { font-family: 'Orbitron', sans-serif; text-align: center; font-size: 16px; color: var(--panel-red); margin-top: 0; letter-spacing: 2px; border-bottom: 2px solid rgba(255, 0, 85, 0.3); padding-bottom: 12px; text-shadow: 0 0 10px rgba(255, 0, 85, 0.6); }
+        
+        .setting-row { display: flex; align-items: center; justify-content: space-between; margin: 15px 0; font-size: 12px; color: #f8fafc; font-weight: bold; gap: 10px; }
+        .setting-row span { display: flex; align-items: center; gap: 6px; }
+        
+        .custom-select { background: #1e1b1c; color: #fff; border: 1px solid var(--panel-red); padding: 6px 8px; border-radius: 6px; font-family: 'Orbitron', sans-serif; outline: none; box-shadow: 0 0 8px rgba(255, 0, 85, 0.2); cursor: pointer; font-size: 11px; }
+        .custom-input { background: #1e1b1c; color: #fff; border: 1px solid var(--panel-red); padding: 7px 10px; border-radius: 6px; font-family: sans-serif; font-size: 12px; outline: none; width: 150px; box-sizing: border-box; }
+        .reset-btn { background: var(--panel-red); color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-family: 'Orbitron'; font-weight: bold; width: 100%; margin-top: 10px; }
+
+        .switch { position: relative; display: inline-block; width: 44px; height: 22px; flex-shrink: 0; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #334155; transition: .3s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--panel-red); box-shadow: 0 0 15px rgba(255, 0, 85, 0.8); }
+        input:checked + .slider:before { transform: translateX(22px); background-color: #020617; }
+
+        @media screen and (max-width: 600px) {
+            .viru-logo { letter-spacing: 1px; font-size: 20px; }
+            .overlay-logo { letter-spacing: 2px; font-size: 22px; }
+            .news-container { width: 92%; padding: 35px 20px; margin-top: 40px; }
+            .footer { letter-spacing: 1px; font-size: 8px; padding: 15px 5px; }
+            #clock { 
+                position: absolute;
+                bottom: 50px; 
+                right: auto;
+                left: 50%;
+                transform: translateX(-50%);
+                font-size: 12px; 
+                padding: 4px 10px; 
+                background: rgba(2, 6, 23, 0.8);
+                border: 1px solid rgba(0, 210, 255, 0.2);
+                white-space: nowrap;
+            }
+            .legal { bottom: 80px; width: 100%; padding: 0 10px; box-sizing: border-box; }
+            .setting-row { flex-direction: row; align-items: center; }
+            .custom-input { width: 100%; }
+        }
     </style>
 </head>
 <body>
 
+    <div id="vignette-layer"></div>
     <div id="clock"></div>
+
+    <div id="maintenance-screen">
+        <h1 id="maint-title" style="color: var(--panel-red); letter-spacing: 4px; font-size: 26px; text-shadow: 0 0 10px red; margin-bottom: 10px;">🚨 SYSTEM DISABLED</h1>
+        <p id="maint-text" style="color: #64748b; font-size: 13px; font-weight: bold; margin: 0;">STANDBY MODE / ARRANGE BY ADM_ENGINE</p>
+    </div>
+
+    <div id="sync-overlay">
+        <div class="sync-box">
+            <div id="sync-title" class="sync-title">SYNCING DATABASE FOR OFFLINE MODE...</div>
+            <div class="progress-container">
+                <div class="progress-bar" id="sync-bar"></div>
+            </div>
+            <div class="sync-percentage" id="sync-text">0%</div>
+        </div>
+    </div>
 
     <div id="welcome-overlay">
         <div class="overlay-logo">TAXILA DIGITAL NEWS</div>
-        <button class="start-btn" onclick="startEngine()">Click to See News</button>
+        <button id="start-btn" class="start-btn" onclick="startEngine()">Click to See News</button>
     </div>
     
     <div id="particles-js"></div>
 
-    <div class="header">
-        <div class="viru-logo">TAXILA DIGITAL NEWS</div>
-        <div class="live-tag"><div class="dot"></div> DIGITAL NEWS ENGINE</div>
+    <div id="viru-settings-panel">
+        <h2 id="sett-h2">ADMIN SETTINGS PANEL</h2>
+        
+        <div class="setting-row">
+            <span id="sett-l-lang">🌐 System Language</span>
+            <select id="sett-lang" class="custom-select" onchange="applyTranslation(); toggleSettings();">
+                <option value="si">සිංහල (Sinhala)</option>
+                <option value="en">English</option>
+                <option value="ta">தமிழ் (Tamil)</option>
+            </select>
+        </div>
+
+        <div class="setting-row">
+            <span id="sett-l-pol">🚫 Block Political News</span>
+            <label class="switch"><input type="checkbox" id="sett-block-politics" onchange="toggleSettings()"><span class="slider"></span></label>
+        </div>
+        <div class="setting-row">
+            <span id="sett-l-sync">📡 Offline Synchronize Engine</span>
+            <label class="switch"><input type="checkbox" id="sett-offline-sync" onchange="triggerOfflineSync()"><span class="slider"></span></label>
+        </div>
+        <div class="setting-row">
+            <span id="sett-l-manual">✍️ Manual Override System</span>
+            <label class="switch"><input type="checkbox" id="sett-manual-mode" onchange="toggleSettings()"><span class="slider"></span></label>
+        </div>
+        <div id="manual-input-area" style="display:none; background:#111; padding:10px; border-radius:10px; margin-bottom:10px;">
+            <input type="text" id="manual-text" class="custom-input" placeholder="Type news headline..." style="width:70%;">
+            <button id="add-btn" onclick="addManualNews()" style="padding:7px; background:var(--panel-red); border:none; color:white; border-radius:5px; cursor:pointer;">ADD</button>
+            <p style="font-size:10px; margin-top:5px; color:#888;">Headline count: <span id="manual-count">0</span>/20</p>
+        </div>
+        
+        <div class="setting-row">
+            <span id="sett-l-mute">🔊 System Mute (Sound OFF)</span>
+            <label class="switch"><input type="checkbox" id="sett-mute" onchange="toggleSettings()"><span class="slider"></span></label>
+        </div>
+        <div class="setting-row">
+            <span id="sett-l-ref">🔄 Auto Refresh News API</span>
+            <label class="switch"><input type="checkbox" id="sett-refresh" checked onchange="toggleSettings()"><span class="slider"></span></label>
+        </div>
+        <div class="setting-row">
+            <span id="sett-l-dur">⏱️ Refresh Time Duration</span>
+            <select id="sett-time-duration" class="custom-select" onchange="toggleSettings()">
+                <option value="60000">1 Minute</option>
+                <option value="300000">5 Minutes</option>
+                <option value="900000" selected>15 Minutes</option>
+            </select>
+        </div>
+        <div class="setting-row">
+            <span id="sett-l-kill">🚨 Local Emergency Shutdown</span>
+            <label class="switch"><input type="checkbox" id="sett-kill" onchange="toggleSettings()"><span class="slider"></span></label>
+        </div>
+        <div class="setting-row">
+            <span id="sett-l-neon">✨ Neon Border Flash Animation</span>
+            <label class="switch"><input type="checkbox" id="sett-border" onchange="toggleSettings()"><span class="slider"></span></label>
+        </div>
+        <div class="setting-row">
+            <span id="sett-l-clean">🔤 Clean Bilingual Text Only</span>
+            <label class="switch"><input type="checkbox" id="sett-clean" onchange="toggleSettings()"><span class="slider"></span></label>
+        </div>
+        <div class="setting-row">
+            <span id="sett-l-vig">🎬 Immersive Vignette Effect</span>
+            <label class="switch"><input type="checkbox" id="sett-vignette" onchange="toggleSettings()"><span class="slider"></span></label>
+        </div>
+        <div class="setting-row">
+            <span id="sett-l-clock">⏰ Display Corner Clock</span>
+            <label class="switch"><input type="checkbox" id="sett-clock" checked onchange="toggleSettings()"><span class="slider"></span></label>
+        </div>
+        <div class="setting-row">
+            <span id="sett-l-boost">⚡ Hardware Acceleration Boost</span>
+            <label class="switch"><input type="checkbox" id="sett-boost" onchange="toggleSettings()"><span class="slider"></span></label>
+        </div>
+
+        <button id="reset-btn" class="reset-btn" onclick="resetSystem()">🔄 RESET TO DEFAULT</button>
+
+        <div id="esc-text" style="text-align: center; font-size: 10px; color: #64748b; margin-top: 15px; font-weight: bold; font-family: 'Orbitron'; letter-spacing: 1px;">PRESS 'ESC' TO LOCK CONFIGURATION</div>
     </div>
 
-    <div class="news-container">
+    <div class="header">
+        <div class="viru-logo">TAXILA DIGITAL NEWS</div>
+        <div id="live-tag" class="live-tag"><div class="dot"></div> DIGITAL NEWS ENGINE</div>
+    </div>
+
+    <div class="news-container" id="main-container">
         <div class="headline" id="title-display">System Initializing...</div>
     </div>
 
-    <div class="legal">
+    <div class="legal" id="footer-legal">
          Next-Gen Automated News Platform | Created by Viruna Randinu
     </div>
 
-    <div class="footer">TAXILA DIGITAL NEWS | 24/7 AUTOMATED NEWS SERVICE</div>
+    <div class="footer" id="footer-text">TAXILA DIGITAL NEWS | 24/7 AUTOMATED NEWS SERVICE</div>
 
-    <audio id="newsMusic" loop>
+    <audio id="newsMusic" loop preload="auto">
         <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mp3">
     </audio>
 
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <script>
-        particlesJS("particles-js", { "particles": { "number": { "value": 60, "density": { "enable": true, "value_area": 800 } }, "color": { "value": "#00d2ff" }, "opacity": { "value": 0.4 }, "size": { "value": 2 }, "line_linked": { "enable": true, "distance": 150, "color": "#00d2ff", "opacity": 0.1, "width": 1 }, "move": { "enable": true, "speed": 1 } } });
+        const translations = {
+            si: {
+                maint_title: "🚨 පද්ධතිය අක්‍රියයි", maint_text: "STANDBY MODE / පද්ධතිය අක්‍රිය කර ඇත",
+                sync_title: "නොබැඳි දත්ත සමමුහුර්තකරණය සිදු වේ...", start_btn: "පුවත් බැලීමට ක්ලික් කරන්න",
+                sett_h2: "පරිපාලක සැකසුම් පුවරුව", sett_l_lang: "🌐 පද්ධති භාෂාව", sett_l_pol: "🚫 දේශපාලන පුවත් අවහිර කරන්න",
+                sett_l_sync: "📡 නොබැඳි සමමුහුර්තකරණය", sett_l_manual: "✍️ අතින් පුවත් ඇතුළත් කිරීම",
+                add_btn: "එකතු කරන්න", sett_l_mute: "🔊 ශබ්දය නිහඬ කරන්න", sett_l_ref: "🔄 පුවත් ස්වයංක්‍රීයව අලුත් කරන්න",
+                sett_l_dur: "⏱️ කාල පරතරය", sett_l_kill: "🚨 හදිසි පද්ධති වසාදැමීම", sett_l_neon: "✨ නියෝන් ආලෝකය",
+                sett_l_clean: "🔤 ද්විභාෂා පෙළ පමණක් (No Emojis)", sett_l_vig: "🎬 තිර ආචරණය", sett_l_clock: "⏰ ඔරලෝසුව පෙන්වන්න",
+                sett_l_boost: "⚡ දෘඩාංග ප්‍රවර්ධනය", reset_btn: "🔄 පෙරනිමි සැකසුම් වලට යන්න", esc_text: "ගැළපීම් සුරැකීමට 'ESC' ඔබන්න",
+                live_tag: "ඩිජිටල් පුවත් එන්ජිම", footer_text: "තක්ෂිලා ඩිජිටල් පුවත් | 24/7 ස්වයංක්‍රීය පුවත් සේවාව",
+                legal: "ඊළඟ පරම්පරාවේ ස්වයංක්‍රීය පුවත් වේදිකාව | විරුණ රන්දිනු විසින් නිර්මාණය කරන ලදී"
+            },
+            ta: {
+                maint_title: "🚨 கணினி முடக்கப்பட்டுள்ளது", maint_text: "STANDBY MODE / கணினி முடக்கப்பட்டுள்ளது",
+                sync_title: "ஆஃப்லைன் தரவு ஒத்திசைவு நடைபெறுகிறது...", start_btn: "செய்திகளைப் பார்க்க கிளிக் செய்யவும்",
+                sett_h2: "நிர்வாக அமைப்புகள்", sett_l_lang: "🌐 கணினி மொழி", sett_l_pol: "🚫 அரசியல் செய்திகளைத் தடு",
+                sett_l_sync: "📡 ஆஃப்லைன் ஒத்திசைவு", sett_l_manual: "✍️ கையேடு உள்ளீடு",
+                add_btn: "சேர்", sett_l_mute: "🔊 ஒலியை முடக்கு", sett_l_ref: "🔄 தானியங்கி புதுப்பிப்பு",
+                sett_l_dur: "⏱️ நேர இடைவெளி", sett_l_kill: "🚨 அவசர நிறுத்தம்", sett_l_neon: "✨ நியான் ஒளி",
+                sett_l_clean: "🔤 இருமொழி உரை மட்டும்", sett_l_vig: "🎬 திரை விளைவு", sett_l_clock: "⏰ கடிகாரத்தைக் காட்டு",
+                sett_l_boost: "⚡ வன்பொருள் முடுக்கம்", reset_btn: "🔄 இயல்புநிலைக்கு மாற்றவும்", esc_text: "அமைப்புகளைப் பூட்ட 'ESC' ஐ அழுத்தவும்",
+                live_tag: "டிஜிட்டல் செய்திகள்", footer_text: "டாக்ஸிலா டிஜிட்டல் செய்திகள் | 24/7 தானியங்கி சேவை",
+                legal: "அடுத்த தலைமுறை தானியங்கி செய்தி தளம் | விருன ரண்டினு உருவாக்கப்பட்டது"
+            },
+            en: {
+                maint_title: "🚨 SYSTEM DISABLED", maint_text: "STANDBY MODE / ARRANGE BY ADM_ENGINE",
+                sync_title: "SYNCING DATABASE FOR OFFLINE MODE...", start_btn: "Click to See News",
+                sett_h2: "ADMIN SETTINGS PANEL", sett_l_lang: "🌐 System Language", sett_l_pol: "🚫 Block Political News",
+                sett_l_sync: "📡 Offline Synchronize Engine", sett_l_manual: "✍️ Manual Override System",
+                add_btn: "ADD", sett_l_mute: "🔊 System Mute (Sound OFF)", sett_l_ref: "🔄 Auto Refresh News API",
+                sett_l_dur: "⏱️ Refresh Time Duration", sett_l_kill: "🚨 Local Emergency Shutdown", sett_l_neon: "✨ Neon Border Flash Animation",
+                sett_l_clean: "🔤 Clean Text Only (No Emojis)", sett_l_vig: "🎬 Immersive Vignette Effect", sett_l_clock: "⏰ Display Corner Clock",
+                sett_l_boost: "⚡ Hardware Acceleration Boost", reset_btn: "🔄 RESET TO DEFAULT", esc_text: "PRESS 'ESC' TO LOCK CONFIGURATION",
+                live_tag: "DIGITAL NEWS ENGINE", footer_text: "TAXILA DIGITAL NEWS | 24/7 AUTOMATED NEWS SERVICE",
+                legal: "Next-Gen Automated News Platform | Created by Viruna Randinu"
+            }
+        };
+
+        function applyTranslation() {
+            const lang = document.getElementById('sett-lang').value;
+            const t = translations[lang];
+            if (!t) return;
+            document.getElementById('maint-title').innerText = t.maint_title;
+            document.getElementById('maint-text').innerText = t.maint_text;
+            document.getElementById('sync-title').innerText = t.sync_title;
+            document.getElementById('start-btn').innerText = t.start_btn;
+            document.getElementById('sett-h2').innerText = t.sett_h2;
+            document.getElementById('sett-l-lang').firstChild.textContent = t.sett_l_lang;
+            document.getElementById('sett-l-pol').firstChild.textContent = t.sett_l_pol;
+            document.getElementById('sett-l-sync').firstChild.textContent = t.sett_l_sync;
+            document.getElementById('sett-l-manual').firstChild.textContent = t.sett_l_manual;
+            document.getElementById('add-btn').innerText = t.add_btn;
+            document.getElementById('sett-l-mute').firstChild.textContent = t.sett_l_mute;
+            document.getElementById('sett-l-ref').firstChild.textContent = t.sett_l_ref;
+            document.getElementById('sett-l-dur').firstChild.textContent = t.sett_l_dur;
+            document.getElementById('sett-l-kill').firstChild.textContent = t.sett_l_kill;
+            document.getElementById('sett-l-neon').firstChild.textContent = t.sett_l_neon;
+            document.getElementById('sett-l-clean').firstChild.textContent = t.sett_l_clean;
+            document.getElementById('sett-l-vig').firstChild.textContent = t.sett_l_vig;
+            document.getElementById('sett-l-clock').firstChild.textContent = t.sett_l_clock;
+            document.getElementById('sett-l-boost').firstChild.textContent = t.sett_l_boost;
+            document.getElementById('reset-btn').innerText = t.reset_btn;
+            document.getElementById('esc-text').innerText = t.esc_text;
+            document.getElementById('live-tag').lastChild.textContent = t.live_tag;
+            document.getElementById('footer-text').innerText = t.footer_text;
+            document.getElementById('footer-legal').innerText = t.legal;
+        }
+
+        // Mobile Optimized Particles
+        const particleCount = window.innerWidth < 600 ? 30 : 60;
+        particlesJS("particles-js", { "particles": { "number": { "value": particleCount, "density": { "enable": true, "value_area": 800 } }, "color": { "value": "#00d2ff" }, "opacity": { "value": 0.4 }, "size": { "value": 2 }, "line_linked": { "enable": true, "distance": 150, "color": "#00d2ff", "opacity": 0.1, "width": 1 }, "move": { "enable": true, "speed": 1 } } });
 
         function updateClock() {
             const now = new Date();
@@ -165,11 +392,85 @@
 
         let newsData = [];
         let currentIndex = 0;
-        const apiUrl = 'https://esena-news-api-v3.vercel.app/news/trending';
+        let refreshIntervalId = null;
+        let displayIntervalId = null;
+        const apiUrl = 'https://esena-news-api-v3.vercel.app/news/latest';
         const music = document.getElementById('newsMusic');
+        const politicalKeywords = ["මන්ත්‍රී", "ඇමති", "ජනාධිපති", "අගමැති", "ඡන්ද", "මැතිවරණ", "දේශපාලන", "පාර්ලිමේන්තු", "සජිත්", "අනුර", "මහින්ද", "රනිල්", "පක්ෂ", "Politics", "Election", "MP ", "Minister", "President", "Parliament"];
+
+        function loadSavedSettings() {
+            const settings = ['sett-mute', 'sett-refresh', 'sett-kill', 'sett-border', 'sett-clean', 'sett-vignette', 'sett-clock', 'sett-boost', 'sett-block-politics', 'sett-offline-sync', 'sett-manual-mode'];
+            settings.forEach(id => {
+                const savedValue = localStorage.getItem(id);
+                if (savedValue !== null) document.getElementById(id).checked = (savedValue === 'true');
+            });
+            
+            const savedDuration = localStorage.getItem('sett-time-duration');
+            if (savedDuration !== null) document.getElementById('sett-time-duration').value = savedDuration;
+            
+            const savedLang = localStorage.getItem('sett-lang');
+            if (savedLang !== null) {
+                document.getElementById('sett-lang').value = savedLang;
+                applyTranslation();
+            }
+
+            const manualNews = JSON.parse(localStorage.getItem('my_manual_db') || "[]");
+            document.getElementById('manual-count').innerText = manualNews.length;
+        }
+
+        function saveSettings() {
+            const settings = ['sett-mute', 'sett-refresh', 'sett-kill', 'sett-border', 'sett-clean', 'sett-vignette', 'sett-clock', 'sett-boost', 'sett-block-politics', 'sett-offline-sync', 'sett-manual-mode'];
+            settings.forEach(id => localStorage.setItem(id, document.getElementById(id).checked));
+            localStorage.setItem('sett-time-duration', document.getElementById('sett-time-duration').value);
+            localStorage.setItem('sett-lang', document.getElementById('sett-lang').value);
+        }
+
+        function resetSystem() {
+            if (confirm("Are you sure you want to reset everything to default?")) {
+                localStorage.clear();
+                location.reload();
+            }
+        }
+
+        function addManualNews() {
+            const input = document.getElementById('manual-text');
+            let manualNews = JSON.parse(localStorage.getItem('my_manual_db') || "[]");
+            if(input.value.trim() !== "" && manualNews.length < 20) {
+                manualNews.push(input.value);
+                localStorage.setItem('my_manual_db', JSON.stringify(manualNews));
+                input.value = "";
+                document.getElementById('manual-count').innerText = manualNews.length;
+            }
+        }
+
+        function triggerOfflineSync() {
+            const isEnabled = document.getElementById('sett-offline-sync').checked;
+            saveSettings();
+            if (isEnabled) {
+                const overlay = document.getElementById('sync-overlay');
+                const bar = document.getElementById('sync-bar');
+                const text = document.getElementById('sync-text');
+                overlay.style.display = 'flex';
+                let progress = 0;
+                const interval = setInterval(() => {
+                    progress += 2;
+                    bar.style.width = progress + '%';
+                    text.innerText = progress + '%';
+                    if (progress >= 100) {
+                        clearInterval(interval);
+                        setTimeout(() => {
+                            overlay.style.display = 'none';
+                            alert("DATABASE SYNCED SUCCESSFULLY");
+                        }, 500);
+                    }
+                }, 50);
+            }
+        }
 
         function startEngine() {
-            music.play();
+            loadSavedSettings();
+            applyAllSettingsEffects();
+            if (!document.getElementById('sett-mute').checked) music.play();
             const overlay = document.getElementById('welcome-overlay');
             overlay.style.opacity = '0';
             setTimeout(() => { overlay.style.visibility = 'hidden'; }, 800);
@@ -177,38 +478,125 @@
         }
 
         async function fetchNews() {
+            if (document.getElementById('sett-manual-mode').checked) {
+                const manualNews = JSON.parse(localStorage.getItem('my_manual_db') || "[]");
+                if(manualNews.length > 0) { newsData = manualNews; return true; }
+            }
+
             try {
                 const response = await fetch(apiUrl);
                 const result = await response.json();
                 if (result.news_data && result.news_data.data) {
-                    newsData = result.news_data.data
+                    let rawList = result.news_data.data;
+                    if (document.getElementById('sett-block-politics').checked) {
+                        rawList = rawList.filter(n => {
+                            const text = n.titleSi + " " + (n.titleEn || "");
+                            return !politicalKeywords.some(word => text.includes(word));
+                        });
+                    }
+                    newsData = rawList
                         .filter(n => !n.titleSi.includes("කාලගුණ") && !n.titleSi.includes("Weather"))
                         .map(n => n.titleSi.replace(/Esana|හෙළකුරු|Ada Derana/gi, "").trim());
                     return true;
                 }
-            } catch (e) { console.error("Sync Error"); }
+            } catch (e) { console.error("Error Fetching API:", e); }
             return false;
+        }
+
+        // New Function to handle Auto API Refresh
+        function setupApiRefresh() {
+            if (refreshIntervalId) clearInterval(refreshIntervalId);
+            
+            if (document.getElementById('sett-refresh').checked) {
+                const duration = parseInt(document.getElementById('sett-time-duration').value);
+                refreshIntervalId = setInterval(async () => {
+                    await fetchNews();
+                    console.log("API Automatically Refreshed!");
+                }, duration);
+            }
         }
 
         function updateDisplay() {
             if (newsData.length > 0) {
                 const titleEl = document.getElementById('title-display');
                 titleEl.style.opacity = 0;
+                
                 setTimeout(() => {
-                    titleEl.innerText = newsData[currentIndex];
+                    if (currentIndex >= newsData.length) currentIndex = 0;
+                    
+                    let currentText = newsData[currentIndex];
+                    
+                    // Logic for "Clean Bilingual Text Only" - Removes Emojis
+                    if (document.getElementById('sett-clean').checked) {
+                        currentText = currentText.replace(/([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, '');
+                    }
+
+                    titleEl.innerText = currentText;
                     titleEl.style.opacity = 1;
                     currentIndex = (currentIndex + 1) % newsData.length;
                 }, 800);
             }
         }
 
+        function applyAllSettingsEffects() {
+            music.muted = document.getElementById('sett-mute').checked;
+            document.getElementById('manual-input-area').style.display = document.getElementById('sett-manual-mode').checked ? 'block' : 'none';
+            
+            const container = document.getElementById('main-container');
+            const particles = document.getElementById('particles-js');
+
+            // Neon Border Effect
+            if(document.getElementById('sett-border').checked) container.classList.add('border-pulse-active');
+            else container.classList.remove('border-pulse-active');
+            
+            // Hardware Acceleration Boost
+            if(document.getElementById('sett-boost').checked) {
+                container.classList.add('hw-boost-active');
+                particles.classList.add('hw-boost-active');
+            } else {
+                container.classList.remove('hw-boost-active');
+                particles.classList.remove('hw-boost-active');
+            }
+
+            document.getElementById('maintenance-screen').style.display = document.getElementById('sett-kill').checked ? 'flex' : 'none';
+            document.getElementById('vignette-layer').className = document.getElementById('sett-vignette').checked ? 'vignette-active' : '';
+            document.getElementById('clock').style.display = document.getElementById('sett-clock').checked ? 'block' : 'none';
+        }
+
+        function toggleSettings() {
+            applyAllSettingsEffects();
+            setupApiRefresh(); // Update Refresh Interval if changed
+            saveSettings();
+        }
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'A' || e.key === 'a') {
+                const panel = document.getElementById('viru-settings-panel');
+                if(!panel.classList.contains('open')) {
+                    const passwordInput = prompt("🔑 ENTER ADMIN PANEL SECURITY PASSWORD:");
+                    if (passwordInput === "viru123") {
+                        panel.style.display = 'block';
+                        setTimeout(() => panel.classList.add('open'), 10);
+                    }
+                }
+            }
+            if (e.key === 'Escape') {
+                const panel = document.getElementById('viru-settings-panel');
+                panel.classList.remove('open');
+                setTimeout(() => panel.style.display = 'none', 300);
+            }
+        });
+
         async function init() {
             const ok = await fetchNews();
             if (ok) {
                 updateDisplay();
-                setInterval(updateDisplay, 8000); 
+                if (displayIntervalId) clearInterval(displayIntervalId);
+                displayIntervalId = setInterval(updateDisplay, 8000); 
+                setupApiRefresh(); // Start Auto API Refresh
             } else {
-                setTimeout(init, 5000);
+                document.getElementById('title-display').innerText = "⚠️ පුවත් ගෙන ඒමේ දෝෂයක්... නැවත උත්සාහ කරමින් පවතී.";
+                setTimeout(init, 5000); // Retry after 5s
             }
         }
     </script>
